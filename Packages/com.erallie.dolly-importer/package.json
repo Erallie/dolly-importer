@@ -1,10 +1,13 @@
 {
   "name": "com.erallie.dolly-importer",
   "displayName": "Dolly Importer",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "unity": "2022.3",
   "description": "An automatic dolly importer for VRChat Worlds.",
   "vrchatVersion": "2022.1.1",
+  "vpmDependencies": {
+    "com.vrchat.worlds": ">=3.9.0"
+  },
   "author": {
     "name": "Erallie",
     "email": "erika@gozarproductions.com",
