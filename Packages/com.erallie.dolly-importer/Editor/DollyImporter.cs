@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class DollyImporter : EditorWindow
 {
+    private const string PackageRoot = "Packages/com.erallie.dolly-importer";
+
     private GameObject targetDolly;
     private string jsonPath = "";
 
@@ -18,6 +20,26 @@ public class DollyImporter : EditorWindow
     private void OnGUI()
     {
         GUILayout.Label("VRChat Dolly JSON Importer", EditorStyles.boldLabel);
+
+        EditorGUILayout.Space();
+
+        EditorGUILayout.HelpBox(
+            "FIRST TIME IMPORTING A DOLLY:\n" +
+            "Leave Target Dolly blank. The importer will automatically add the " +
+            "starting Dolly prefab to your scene and import the JSON into it.",
+            MessageType.Info
+        );
+
+        EditorGUILayout.Space();
+
+        EditorGUILayout.HelpBox(
+            "REIMPORTING / UPDATING A DOLLY:\n" +
+            "Select your existing Dolly as the Target Dolly.\n\n" +
+            "Do not remove the first Path, the first Point inside that Path, or the " +
+            "VRChat Dolly Path/Point scripts attached to them. The importer uses " +
+            "these as templates when rebuilding the Dolly.",
+            MessageType.Warning
+        );
 
         EditorGUILayout.Space();
 
@@ -53,7 +75,6 @@ public class DollyImporter : EditorWindow
         EditorGUILayout.Space();
 
         EditorGUI.BeginDisabledGroup(
-            targetDolly == null ||
             string.IsNullOrEmpty(jsonPath) ||
             !File.Exists(jsonPath)
         );
@@ -68,36 +89,97 @@ public class DollyImporter : EditorWindow
         EditorGUILayout.Space();
 
         EditorGUILayout.HelpBox(
-            "The selected Dolly must already contain at least one Path with at least " +
-            "one Point. The first Path and Point will be used as templates.\n\n" +
-            "The existing Path hierarchy will be replaced by the contents of the JSON.",
+            "AFTER IMPORTING:\n" +
+            "Click \"Collect Paths & Points\" on the Camera Dolly Animation component. " +
+            "Then edit the Dolly's animation settings however you like, such as its " +
+            "path type, loop behavior, speed settings, focus settings, and other " +
+            "Camera Dolly Animation options.",
             MessageType.Info
         );
     }
 
     private void ImportDolly()
     {
+        GameObject createdDolly = null;
+        bool firstImport = targetDolly == null;
+
         try
         {
             // ============================================================
-            // VALIDATE TEMPLATE HIERARCHY
+            // FIRST IMPORT - LOAD STARTING PREFAB
             // ============================================================
 
-            if (targetDolly.transform.childCount == 0)
+            if (firstImport)
             {
-                ShowTemplateError();
+                GameObject startingPrefab = FindStartingPrefab();
+
+                if (startingPrefab == null)
+                {
+                    ShowModifiedPrefabError();
+                    return;
+                }
+
+                if (!ValidateDollyHierarchy(startingPrefab))
+                {
+                    ShowModifiedPrefabError();
+                    return;
+                }
+
+                createdDolly = PrefabUtility.InstantiatePrefab(
+                    startingPrefab
+                ) as GameObject;
+
+                if (createdDolly == null)
+                {
+                    ShowModifiedPrefabError();
+                    return;
+                }
+
+                Undo.RegisterCreatedObjectUndo(
+                    createdDolly,
+                    "Create Camera Dolly"
+                );
+
+                targetDolly = createdDolly;
+
+                Selection.activeGameObject = targetDolly;
+            }
+
+
+            // ============================================================
+            // VALIDATE TARGET
+            // ============================================================
+
+            if (!ValidateDollyHierarchy(targetDolly))
+            {
+                if (firstImport)
+                {
+                    if (createdDolly != null)
+                    {
+                        Undo.DestroyObjectImmediate(createdDolly);
+                        targetDolly = null;
+                    }
+
+                    ShowModifiedPrefabError();
+                }
+                else
+                {
+                    ShowExistingDollyError();
+                }
+
                 return;
             }
 
-            Transform originalPathTemplate = targetDolly.transform.GetChild(0);
 
-            if (originalPathTemplate.childCount == 0)
-            {
-                ShowTemplateError();
-                return;
-            }
+            // ============================================================
+            // GET TEMPLATE HIERARCHY
+            // ============================================================
 
-            Transform originalPointTemplate = originalPathTemplate.GetChild(0);
+            Transform originalPathTemplate =
+                targetDolly.transform.GetChild(0);
+
+            Transform originalPointTemplate =
+                originalPathTemplate.GetChild(0);
 
 
             // ============================================================
@@ -106,12 +188,15 @@ public class DollyImporter : EditorWindow
 
             string json = File.ReadAllText(jsonPath);
 
-            // VRChat's exported Dolly is a raw JSON array.
-            // JsonUtility needs an object at the root, so wrap it.
-            string wrappedJson = "{\"Points\":" + json + "}";
+            // VRChat exports the Dolly as a raw JSON array.
+            // JsonUtility requires an object at the root, so wrap it.
+            string wrappedJson =
+                "{\"Points\":" + json + "}";
 
             DollyJsonWrapper wrapper =
-                JsonUtility.FromJson<DollyJsonWrapper>(wrappedJson);
+                JsonUtility.FromJson<DollyJsonWrapper>(
+                    wrappedJson
+                );
 
             if (
                 wrapper == null ||
@@ -119,9 +204,15 @@ public class DollyImporter : EditorWindow
                 wrapper.Points.Length == 0
             )
             {
+                if (firstImport && createdDolly != null)
+                {
+                    Undo.DestroyObjectImmediate(createdDolly);
+                    targetDolly = null;
+                }
+
                 EditorUtility.DisplayDialog(
                     "Dolly Importer",
-                    "No Dolly points were found in the JSON.",
+                    "No Dolly points were found in the selected JSON file.",
                     "OK"
                 );
 
@@ -171,10 +262,7 @@ public class DollyImporter : EditorWindow
 
 
             // ============================================================
-            // CREATE TEMPORARY COPIES OF OUR TEMPLATES
-            //
-            // We need these because we're about to destroy the old
-            // hierarchy.
+            // CREATE TEMPORARY TEMPLATES
             // ============================================================
 
             GameObject pathTemplate = Instantiate(
@@ -192,8 +280,7 @@ public class DollyImporter : EditorWindow
             pointTemplate.hideFlags = HideFlags.HideAndDontSave;
 
 
-            // Remove children from the path template.
-            // We only want the Path object and its components.
+            // The Path template should contain no Points.
             for (
                 int i = pathTemplate.transform.childCount - 1;
                 i >= 0;
@@ -339,12 +426,14 @@ public class DollyImporter : EditorWindow
                             pointTemplate
                         );
 
-                        EditorUtility.DisplayDialog(
-                            "Dolly Importer",
-                            "Could not identify the Dolly Point " +
-                            "component on the template Point.",
-                            "OK"
-                        );
+                        if (firstImport)
+                        {
+                            ShowModifiedPrefabError();
+                        }
+                        else
+                        {
+                            ShowExistingDollyError();
+                        }
 
                         return;
                     }
@@ -406,23 +495,138 @@ public class DollyImporter : EditorWindow
                 $"Import complete!\n\n" +
                 $"Paths: {createdPathCount}\n" +
                 $"Points: {createdPointCount}\n\n" +
-                "Now click \"Collect Paths & Points\" " +
-                "on the VRC Camera Dolly Animation component.",
+                "You can now edit the Camera Dolly Animation settings " +
+                "according to your liking.\n\n" +
+                "Remember to click \"Collect Paths & Points\" on the " +
+                "Camera Dolly Animation component if necessary.",
                 "OK"
             );
         }
         catch (Exception exception)
         {
-            Debug.LogException(
-                exception
-            );
+            Debug.LogException(exception);
+
+            if (
+                firstImport &&
+                createdDolly != null
+            )
+            {
+                DestroyImmediate(createdDolly);
+                targetDolly = null;
+            }
 
             EditorUtility.DisplayDialog(
-                "Dolly Import Failed",
+                "Error Importing Camera Dolly",
+                "There was an error importing the camera dolly.\n\n" +
                 exception.Message,
                 "OK"
             );
         }
+    }
+
+
+    // ================================================================
+    // FIND STARTING PREFAB
+    // ================================================================
+
+    private GameObject FindStartingPrefab()
+    {
+        string[] prefabGuids = AssetDatabase.FindAssets(
+            "t:Prefab",
+            new string[]
+            {
+                PackageRoot
+            }
+        );
+
+        foreach (string guid in prefabGuids)
+        {
+            string assetPath =
+                AssetDatabase.GUIDToAssetPath(guid);
+
+            GameObject prefab =
+                AssetDatabase.LoadAssetAtPath<GameObject>(
+                    assetPath
+                );
+
+            if (
+                prefab != null &&
+                ValidateDollyHierarchy(prefab)
+            )
+            {
+                return prefab;
+            }
+        }
+
+        return null;
+    }
+
+
+    // ================================================================
+    // VALIDATE DOLLY
+    // ================================================================
+
+    private bool ValidateDollyHierarchy(
+        GameObject dolly
+    )
+    {
+        if (dolly == null)
+        {
+            return false;
+        }
+
+        // The root must have the Camera Dolly Animation component.
+        if (
+            FindDollyComponent(
+                dolly,
+                "Animation"
+            ) == null
+        )
+        {
+            return false;
+        }
+
+        // There must be at least one Path.
+        if (dolly.transform.childCount == 0)
+        {
+            return false;
+        }
+
+        GameObject path =
+            dolly.transform.GetChild(0).gameObject;
+
+        // The first Path must have its Dolly Path component.
+        if (
+            FindDollyComponent(
+                path,
+                "Path"
+            ) == null
+        )
+        {
+            return false;
+        }
+
+        // The first Path must contain at least one Point.
+        if (path.transform.childCount == 0)
+        {
+            return false;
+        }
+
+        GameObject point =
+            path.transform.GetChild(0).gameObject;
+
+        // The first Point must have its Dolly Point component.
+        if (
+            FindDollyComponent(
+                point,
+                "Point"
+            ) == null
+        )
+        {
+            return false;
+        }
+
+        return true;
     }
 
 
@@ -445,7 +649,6 @@ public class DollyImporter : EditorWindow
                 continue;
             }
 
-            // Ignore Transform.
             if (component is Transform)
             {
                 continue;
@@ -453,13 +656,6 @@ public class DollyImporter : EditorWindow
 
             Type type = component.GetType();
 
-            /*
-             * We don't need to know the namespace.
-             *
-             * We're simply looking for a component whose type name
-             * contains both "Dolly" and the expected object type,
-             * e.g. Dolly + Point.
-             */
             if (
                 type.Name.IndexOf(
                     "Dolly",
@@ -494,7 +690,6 @@ public class DollyImporter : EditorWindow
             );
 
         serializedPoint.Update();
-
 
         SetFloat(
             serializedPoint,
@@ -576,11 +771,6 @@ public class DollyImporter : EditorWindow
             "_lookAtMeYOffset"
         );
 
-        /*
-         * Exposure is present in VRChat's exported JSON.
-         * If the current SDK exposes a serialized Exposure field,
-         * populate it. Otherwise it will simply be skipped.
-         */
         SetFloat(
             serializedPoint,
             data.Exposure,
@@ -588,7 +778,6 @@ public class DollyImporter : EditorWindow
             "Exposure",
             "_exposure"
         );
-
 
         serializedPoint.ApplyModifiedProperties();
     }
@@ -620,19 +809,11 @@ public class DollyImporter : EditorWindow
                 SerializedPropertyType.Float
             )
             {
-                property.floatValue =
-                    value;
-
+                property.floatValue = value;
                 return true;
             }
         }
 
-        /*
-         * Don't throw an error here.
-         *
-         * Different SDK versions may expose different serialized
-         * properties. Missing optional properties are simply skipped.
-         */
         return false;
     }
 
@@ -648,35 +829,42 @@ public class DollyImporter : EditorWindow
     {
         if (pathTemplate != null)
         {
-            DestroyImmediate(
-                pathTemplate
-            );
+            DestroyImmediate(pathTemplate);
         }
 
         if (pointTemplate != null)
         {
-            DestroyImmediate(
-                pointTemplate
-            );
+            DestroyImmediate(pointTemplate);
         }
     }
 
 
     // ================================================================
-    // TEMPLATE ERROR
+    // ERROR POPUPS
     // ================================================================
 
-    private void ShowTemplateError()
+    private void ShowModifiedPrefabError()
     {
         EditorUtility.DisplayDialog(
-            "Dolly Importer",
-            "The selected Dolly needs an existing template hierarchy.\n\n" +
-            "It should contain at least:\n\n" +
-            "Dolly\n" +
-            "└── Path\n" +
-            "    └── Point\n\n" +
-            "The Path and Point should already have their normal " +
-            "VRChat Dolly components.",
+            "Error Importing Camera Dolly",
+            "There was an error importing the camera dolly.\n\n" +
+            "The Dolly Importer's starting prefab appears to have been " +
+            "modified or is missing one or more objects or scripts required " +
+            "for the import.\n\n" +
+            "Please reimport the Dolly Importer package and try again.",
+            "OK"
+        );
+    }
+
+    private void ShowExistingDollyError()
+    {
+        EditorUtility.DisplayDialog(
+            "Error Importing Camera Dolly",
+            "There was an error importing the camera dolly.\n\n" +
+            "The selected Dolly is missing one or more objects or scripts " +
+            "required for the import.\n\n" +
+            "Do not remove the first Path, the first Point inside that Path, " +
+            "or their VRChat Dolly Path/Point scripts.",
             "OK"
         );
     }
@@ -691,7 +879,6 @@ public class DollyImporter : EditorWindow
     {
         public DollyPointJson[] Points;
     }
-
 
     [Serializable]
     private class DollyPointJson
@@ -720,7 +907,6 @@ public class DollyImporter : EditorWindow
         public int Index;
         public int PathIndex;
     }
-
 
     [Serializable]
     private class DollyVector
