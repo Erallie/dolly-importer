@@ -18,6 +18,39 @@ public class DollyImporter : EditorWindow
         GetWindow<DollyImporter>("Dolly Importer");
     }
 
+    private string GetPackageVersion()
+    {
+        string packageJsonPath = Path.Combine(
+            PackageRoot,
+            "package.json"
+        );
+
+        if (!File.Exists(packageJsonPath))
+        {
+            return "Unknown";
+        }
+
+        try
+        {
+            string json = File.ReadAllText(packageJsonPath);
+            PackageJson packageJson = JsonUtility.FromJson<PackageJson>(json);
+
+            if (
+                packageJson != null &&
+                !string.IsNullOrEmpty(packageJson.version)
+            )
+            {
+                return packageJson.version;
+            }
+        }
+        catch (Exception)
+        {
+            // Don't break the importer if the version cannot be read.
+        }
+
+        return "Unknown";
+    }
+
     private void OnGUI()
     {
         GUILayout.Label("VRChat Dolly JSON Importer", EditorStyles.boldLabel);
@@ -101,6 +134,13 @@ public class DollyImporter : EditorWindow
         EditorGUILayout.Space();
 
         GUILayout.FlexibleSpace();
+
+        GUIStyle versionStyle = new GUIStyle(EditorStyles.centeredGreyMiniLabel);
+
+        EditorGUILayout.LabelField(
+            $"Version {GetPackageVersion()}",
+            versionStyle
+        );
 
         EditorGUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
@@ -932,5 +972,11 @@ public class DollyImporter : EditorWindow
         public float X;
         public float Y;
         public float Z;
+    }
+
+    [Serializable]
+    private class PackageJson
+    {
+        public string version;
     }
 }
