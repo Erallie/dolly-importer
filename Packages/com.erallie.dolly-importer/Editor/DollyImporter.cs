@@ -7,6 +7,7 @@ using UnityEngine;
 public class DollyImporter : EditorWindow
 {
     private const string PackageRoot = "Packages/com.erallie.dolly-importer";
+    private const string GitHubUrl = "https://github.com/Erallie/dolly-importer";
 
     private GameObject targetDolly;
     private string jsonPath = "";
@@ -96,6 +97,23 @@ public class DollyImporter : EditorWindow
             "Camera Dolly Animation options.",
             MessageType.Info
         );
+
+        EditorGUILayout.Space();
+
+        GUILayout.FlexibleSpace();
+
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+
+        if (EditorGUILayout.LinkButton("View on GitHub"))
+        {
+            Application.OpenURL("https://github.com/Erallie/dolly-importer");
+        }
+
+        GUILayout.FlexibleSpace();
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.Space();
     }
 
     private void ImportDolly()
