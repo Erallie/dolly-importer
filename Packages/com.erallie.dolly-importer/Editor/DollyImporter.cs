@@ -12,7 +12,7 @@ public class DollyImporter : EditorWindow
     private GameObject targetDolly;
     private string jsonPath = "";
 
-    [MenuItem("Tools/Erallie/Dolly Importer")]
+    [MenuItem("Tools/Erallie/Dolly Importer/Import Dolly JSON into Scene", false, 0)]
     public static void ShowWindow()
     {
         GetWindow<DollyImporter>("Dolly Importer");
@@ -53,26 +53,37 @@ public class DollyImporter : EditorWindow
 
     private void OnGUI()
     {
-        GUILayout.Label("VRChat Dolly JSON Importer", EditorStyles.boldLabel);
+        DrawGuidanceHeading("VRChat Dolly JSON Importer", 20);
 
         EditorGUILayout.Space();
 
-        EditorGUILayout.HelpBox(
-            "FIRST TIME IMPORTING A DOLLY:\n" +
+        DrawGuidanceHeading("First Time Importing a Dolly");
+
+        DrawGuidanceDescription(
             "Leave Target Dolly blank. The importer will automatically add the " +
-            "starting Dolly prefab to your scene and import the JSON into it.",
-            MessageType.Info
+            "starting Dolly prefab to your scene and import the JSON into it."
         );
 
         EditorGUILayout.Space();
 
-        EditorGUILayout.HelpBox(
-            "REIMPORTING / UPDATING A DOLLY:\n" +
+        DrawGuidanceHeading("Reimporting / Updating a Dolly");
+
+        DrawGuidanceDescription(
             "Select your existing Dolly as the Target Dolly.\n\n" +
             "Do not remove the first Path, the first Point inside that Path, or the " +
             "VRChat Dolly Path/Point scripts attached to them. The importer uses " +
-            "these as templates when rebuilding the Dolly.",
-            MessageType.Warning
+            "these as templates when rebuilding the Dolly."
+        );
+
+        EditorGUILayout.Space();
+
+        DrawGuidanceHeading("After Importing");
+
+        DrawGuidanceDescription(
+            "Click \"Collect Paths & Points\" on the Camera Dolly Animation component. " +
+            "Then edit the Dolly's animation settings however you like, such as its " +
+            "path type, loop behavior, speed settings, focus settings, and other " +
+            "Camera Dolly Animation options."
         );
 
         EditorGUILayout.Space();
@@ -122,17 +133,6 @@ public class DollyImporter : EditorWindow
 
         EditorGUILayout.Space();
 
-        EditorGUILayout.HelpBox(
-            "AFTER IMPORTING:\n" +
-            "Click \"Collect Paths & Points\" on the Camera Dolly Animation component. " +
-            "Then edit the Dolly's animation settings however you like, such as its " +
-            "path type, loop behavior, speed settings, focus settings, and other " +
-            "Camera Dolly Animation options.",
-            MessageType.Info
-        );
-
-        EditorGUILayout.Space();
-
         GUILayout.FlexibleSpace();
 
         GUIStyle versionStyle = new GUIStyle(EditorStyles.centeredGreyMiniLabel);
@@ -154,6 +154,30 @@ public class DollyImporter : EditorWindow
         EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.Space();
+    }
+
+    private static void DrawGuidanceHeading(string text, int fontSize = 14)
+    {
+        var style = new GUIStyle(EditorStyles.boldLabel)
+        {
+            fontSize = fontSize,
+            wordWrap = true
+        };
+
+        EditorGUILayout.Space(8);
+        GUILayout.Label(text, style);
+        EditorGUILayout.Space(4);
+    }
+
+    private static void DrawGuidanceDescription(string text)
+    {
+        var style = new GUIStyle(EditorStyles.label)
+        {
+            wordWrap = true
+        };
+
+        GUILayout.Label(text, style);
+        EditorGUILayout.Space(6);
     }
 
     private void ImportDolly()
