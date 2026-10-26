@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 881918431163112211}
   - component: {fileID: 2907922766663849744}
   m_Layer: 0
-  m_Name: Import Dolly Toggle
+  m_Name: Dolly Toggle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

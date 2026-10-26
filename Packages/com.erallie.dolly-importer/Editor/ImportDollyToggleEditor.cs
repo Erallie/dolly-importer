@@ -40,7 +40,7 @@ public class ImportDollyToggleEditor : Editor
         EditorGUILayout.Space(4);
 
         EditorGUILayout.LabelField(
-            "Imports the assigned Camera Dolly Animation when this object is interacted with.",
+            "Imports the assigned Camera Dolly Animation into the player's camera when this object is interacted with.\n\nMake sure you import your Dolly JSON into the scene first under Tools > Erallie > Dolly Importer > Import Dolly JSON into Scene.",
             descriptionStyle
         );
 
