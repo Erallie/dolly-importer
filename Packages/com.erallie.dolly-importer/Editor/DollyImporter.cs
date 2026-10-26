@@ -86,7 +86,7 @@ public class DollyImporter : EditorWindow
             "Camera Dolly Animation options."
         );
 
-        EditorGUILayout.Space();
+        EditorGUILayout.Space(20);
 
         targetDolly = (GameObject)EditorGUILayout.ObjectField(
             "Target Dolly",
