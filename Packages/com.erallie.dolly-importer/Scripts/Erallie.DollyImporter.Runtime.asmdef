@@ -1,0 +1,19 @@
+{
+    "name": "Erallie.DollyImporter.Runtime",
+    "rootNamespace": "",
+    "references": [
+        "UdonSharp.Runtime",
+        "VRC.SDK3"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "UDONSHARP"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

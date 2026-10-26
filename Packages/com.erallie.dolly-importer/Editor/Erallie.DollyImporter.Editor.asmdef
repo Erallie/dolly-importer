@@ -1,6 +1,12 @@
 {
     "name": "Erallie.DollyImporter.Editor",
-    "references": [],
+    "references": [
+        "Erallie.DollyImporter.Runtime",
+        "UdonSharp.Runtime",
+        "UdonSharp.Editor",
+        "VRC.SDK3",
+        "VRC.Udon"
+    ],
     "includePlatforms": [
         "Editor"
     ],
