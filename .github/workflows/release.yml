@@ -87,24 +87,24 @@ jobs:
           tag_name: ${{ env.version }}
 
 
-    update-listing:
-        name: Trigger VCC listing rebuild
-        needs: build
-        runs-on: ubuntu-latest
-        permissions: {}
-        steps:
-            - name: Dispatch listing workflow
-              env:
-                  GH_TOKEN: ${{ secrets.VCC_LISTING_TOKEN }}
-              shell: bash
-              run: |
-                  set -euo pipefail
+  update-listing:
+      name: Trigger VCC listing rebuild
+      needs: build
+      runs-on: ubuntu-latest
+      permissions: {}
+      steps:
+          - name: Dispatch listing workflow
+            env:
+                GH_TOKEN: ${{ secrets.VCC_LISTING_TOKEN }}
+            shell: bash
+            run: |
+                set -euo pipefail
 
-                  if [ -z "$GH_TOKEN" ]; then
-                      echo "::error::Add the VCC_LISTING_TOKEN repository secret with Actions write access to Erallie/vcc-listing."
-                      exit 1
-                  fi
+                if [ -z "$GH_TOKEN" ]; then
+                    echo "::error::Add the VCC_LISTING_TOKEN repository secret with Actions write access to Erallie/vcc-listing."
+                    exit 1
+                fi
 
-                  gh workflow run build-listing.yml \
-                      --repo Erallie/vcc-listing \
-                      --ref main
+                gh workflow run build-listing.yml \
+                    --repo Erallie/vcc-listing \
+                    --ref main
