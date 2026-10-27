@@ -10,7 +10,7 @@
 
 ---
 
-This is a Unity Editor tool for importing VRChat Camera Dolly paths from a VRChat-exported JSON file into a VRChat world so that your players can import it into their VRChat Cameras..
+This is a Unity Editor tool for importing VRChat Camera Dolly paths from a VRChat-exported JSON file into a VRChat world so that your players can import it into their VRChat Cameras.
 
 Instead of manually recreating camera paths and points in Unity, this importer reads the exported dolly JSON and automatically creates the corresponding **Paths** and **Points**, including their positions, rotations, and camera settings.
 
