@@ -38,7 +38,7 @@ Instead of manually recreating camera paths and points in Unity, Dolly Importer 
 
 ## Requirements
 
-Dolly Importer is designed for **VRChat worlds** with a world SDK of 3.9.0 or greater.
+Dolly Importer is designed for **VRChat worlds** with a worlds SDK of 3.9.0 or greater.
 
 ## Installation
 
