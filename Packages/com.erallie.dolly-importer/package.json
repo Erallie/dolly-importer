@@ -1,6 +1,6 @@
 {
   "name": "com.erallie.dolly-importer",
-  "displayName": "Dolly Importer",
+  "displayName": "Dolly Importer for Worlds",
   "version": "0.0.6",
   "unity": "2022.3",
   "description": "Automatically imports your exported dolly json into your VRChat world so that visitors at your world can import it into their cameras.",

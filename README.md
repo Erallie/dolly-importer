@@ -1,4 +1,4 @@
-# Dolly Importer
+# Dolly Importer for Worlds
 
 [![Latest Release](https://img.shields.io/github/release-date/Erallie/dolly-importer?display_date=published_at&style=for-the-badge&label=Latest%20Release)](https://github.com/Erallie/dolly-importer/releases/latest)
 ![Latest Downloads](https://img.shields.io/github/downloads/Erallie/dolly-importer/latest/total?sort=semver&style=for-the-badge&logo=Github&label=Latest%20Downloads)
