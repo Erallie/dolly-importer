@@ -12,12 +12,12 @@
 
 **Dolly Importer** is a Unity Editor tool for importing VRChat Camera Dolly paths from a VRChat-exported JSON file into a VRChat world.
 
-Instead of manually recreating camera paths and points in Unity, Dolly Importer reads the exported Dolly JSON and automatically creates the corresponding **Paths** and **Points**, including their positions, rotations, and camera settings.
+Instead of manually recreating camera paths and points in Unity, this importer reads the exported dolly JSON and automatically creates the corresponding **Paths** and **Points**, including their positions, rotations, and camera settings.
 
 ## Features
 
 - Imports VRChat Camera Dolly JSON files directly into Unity
-- Automatically creates all Paths and Points from the exported Dolly
+- Automatically creates all Paths and Points from the exported dolly
 - Imports point position and rotation
 - Imports camera settings stored on each point, including:
   - Zoom
@@ -30,14 +30,14 @@ Instead of manually recreating camera paths and points in Unity, Dolly Importer 
   - Lightness
   - Look At Me offsets
   - Exposure
-- Supports multiple paths in a single Dolly
-- Can replace the paths of an existing Dolly
-- Automatically creates a new Camera Dolly from the included starting prefab when importing for the first time
+- Supports multiple paths in a single dolly
+- Can replace the paths of an existing dolly
+- Automatically creates a new camera dolly from the included starting prefab when importing for the first time
 - Supports Unity Undo via `Ctrl + Z`
 
 ## Requirements
 
-Dolly Importer is designed for **VRChat Worlds projects** using a version of the VRChat Worlds SDK that includes the Camera Dolly system.
+This tool is designed for **VRChat Worlds projects** using a version of the VRChat Worlds SDK that includes the camera dolly system.
 
 ## Installation
 
@@ -65,40 +65,27 @@ configuring the components.
 
 In Unity, open:
 
-**Tools → Erallie → Dolly Importer**
+**Tools → Erallie → Dolly Importer → Import Dolly JSON Into Scene**
 
-## Importing a Dolly for the First Time
+## Importing a Dolly
 
-If this is your first time importing the Dolly into the project:
+If this is your first time importing the dolly into the project:
 
-1. Open **Tools → Erallie → Dolly Importer**.
-2. Leave **Target Dolly** blank.
+1. Open **Tools → Erallie → Dolly Importer → Import dolly JSON Into Scene**.
+2. Leave **Target Dolly** blank if importing the first time. Drag the existing dolly GameObject into **Target Dolly**.
 3. Click **Browse...** and select the JSON file exported from VRChat.
 4. Click **Import / Replace Dolly**.
 
-Dolly Importer will automatically add the included starting Dolly prefab to the scene and populate it with the Paths and Points from the JSON file.
-
-## Updating an Existing Dolly
-
-You can also replace the Paths and Points of a Dolly that has already been imported:
-
-1. Open **Tools → Erallie → Dolly Importer**.
-2. Drag the existing Dolly GameObject into **Target Dolly**.
-3. Select the JSON file you want to import.
-4. Click **Import / Replace Dolly**.
-
-The existing Path hierarchy will be replaced with the Paths and Points contained in the selected JSON.
-
 > [!IMPORTANT]
-> Importing into an existing Dolly replaces its existing Paths and Points.
+> Importing into an existing dolly replaces its existing Paths and Points.
 
 ## After Importing
 
 After the import finishes:
 
-1. Select the Dolly GameObject.
+1. Select the dolly GameObject.
 2. On the **Camera Dolly Animation** component, click **Collect Paths & Points**.
-3. Configure the Dolly's animation settings according to your liking.
+3. Configure the dolly's animation settings according to your liking.
 
 For example, you may want to adjust its path type, loop behavior, speed settings, focus settings, or other Camera Dolly Animation options.
 
@@ -107,7 +94,7 @@ For example, you may want to adjust its path type, loop behavior, speed settings
 
 ## Do Not Remove the Template Path and Point
 
-Dolly Importer uses the first Path and the first Point inside it as templates when rebuilding an existing Dolly.
+This importer uses the first Path and the first Point inside it as templates when rebuilding an existing dolly.
 
 Do **not** remove:
 
@@ -126,26 +113,26 @@ Dolly
 
 The required VRChat Camera Dolly components must remain attached to these objects.
 
-Once the Dolly has been imported, these objects may contain your actual imported path data. They still need to remain intact if you want to use that Dolly as the target of a future import.
+Once the dolly has been imported, these objects will contain your actual imported path data. They still need to remain intact if you want to use that dolly as the target of a future import.
 
 ## Starting Prefab
 
 The package includes a starting prefab containing the hierarchy and VRChat Camera Dolly components required by the importer.
 
-When **Target Dolly** is left blank, Dolly Importer automatically uses this prefab to create a new Dolly in the scene.
+When **Target Dolly** is left blank, the dolly importer automatically uses this prefab to create a new dolly in the scene.
 
 You normally do not need to interact with or modify the starting prefab.
 
 > [!WARNING]
-> Do not modify or remove the required objects or Camera Dolly components from the starting prefab.
+> Do not modify or remove the required objects or camera dolly components from the starting prefab.
 
-If Dolly Importer detects that the starting prefab is missing the hierarchy or components necessary to perform an import, it will stop the import and ask you to **reimport the Dolly Importer package**.
+If the script detects that the starting prefab is missing the hierarchy or components necessary to perform an import, it will stop the import and ask you to **reimport the Dolly Importer package**.
 
 ## JSON Files
 
-Dolly Importer is intended for JSON files exported by VRChat's Camera Dolly system.
+This tool is intended for JSON files exported by VRChat's camera dolly system.
 
-The importer uses the exported Path and Point indexes to reconstruct the Dolly hierarchy in Unity.
+The importer uses the exported Path and Point indexes to reconstruct the dolly hierarchy in Unity.
 
 For example:
 
@@ -169,24 +156,24 @@ The number of Paths and Points is determined automatically from the JSON.
 
 ### The importer says the starting prefab has been modified
 
-The included starting prefab is missing one or more objects or components required by Dolly Importer.
+The included starting prefab is missing one or more objects or components required by the importer.
 
 Reimport the **Dolly Importer** package to restore the original starting prefab.
 
-### My existing Dolly cannot be imported into
+### My existing dolly cannot be imported into
 
-Make sure the Dolly still contains its first Path and first Point and that their VRChat Camera Dolly components have not been removed.
+Make sure the dolly still contains its first Path and first Point and that their VRChat Camera Dolly components have not been removed.
 
-### The Dolly does not follow the imported paths
+### The dolly does not follow the imported paths
 
-After importing, select the Dolly and click **Collect Paths & Points** on the Camera Dolly Animation component.
+After importing, select the dolly and click **Collect Paths & Points** on the Camera Dolly Animation component.
 
-### I want to import a completely new Dolly
+### I want to import a second dolly
 
-Leave **Target Dolly** blank. Dolly Importer will automatically create a new Dolly from the included starting prefab.
+Leave **Target Dolly** blank. The importer will automatically create a new dolly from the included starting prefab.
 
 ## Notes
 
-Dolly Importer is an **Editor tool**. It is used to create and modify the Camera Dolly hierarchy while building your VRChat world and does not need to run inside VRChat.
+This tool is an **Editor tool**. It is used to create and modify the camera dolly hierarchy while building your VRChat world and does not need to run inside VRChat.
 
-The imported Camera Dolly itself uses VRChat's standard Camera Dolly components.
+The imported camera dolly itself uses VRChat's standard camera dolly components.
