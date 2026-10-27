@@ -10,7 +10,7 @@
 
 ---
 
-**Dolly Importer** is a Unity Editor tool for importing VRChat Camera Dolly paths from a VRChat-exported JSON file into a VRChat world.
+This is a Unity Editor tool for importing VRChat Camera Dolly paths from a VRChat-exported JSON file into a VRChat world so that your players can import it into their VRChat Cameras..
 
 Instead of manually recreating camera paths and points in Unity, Dolly Importer reads the exported Dolly JSON and automatically creates the corresponding **Paths** and **Points**, including their positions, rotations, and camera settings.
 
@@ -38,7 +38,7 @@ Instead of manually recreating camera paths and points in Unity, Dolly Importer 
 
 ## Requirements
 
-Dolly Importer is designed for **VRChat Worlds projects** using a version of the VRChat Worlds SDK that includes the Camera Dolly system.
+Dolly Importer is designed for **VRChat worlds** with a world SDK of 3.9.0 or greater.
 
 ## Installation
 
