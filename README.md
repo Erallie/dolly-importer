@@ -33,6 +33,7 @@ Instead of manually recreating camera paths and points in Unity, Dolly Importer 
 - Supports multiple paths in a single Dolly
 - Can replace the paths of an existing Dolly
 - Automatically creates a new Camera Dolly from the included starting prefab when importing for the first time
+- Includes a prefab toggle for the world so players can import the dolly into their VRC camera.
 - Supports Unity Undo via `Ctrl + Z`
 
 ## Requirements
